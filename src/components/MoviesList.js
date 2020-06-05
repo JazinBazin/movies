@@ -1,5 +1,6 @@
 import React from "react";
 import Movie from "./Movie";
+import Pagination from "./Pagination";
 import config from "../config";
 
 export default class MoviesList extends React.Component {
@@ -7,13 +8,14 @@ export default class MoviesList extends React.Component {
         super(props);
         this.state = {
             movies: [],
+            page: 1,
             loading: true,
             loadingError: false,
         }
     }
 
     fetchMovies = () => {
-        fetch(`${config.apiUrl}&s=${this.props.searchString}`)
+        fetch(`${config.apiUrl}&s=${this.props.searchString}&page=${this.state.page}`)
             .then(response => response.json())
             .then(response => {
                 if (response.Response) {
@@ -40,9 +42,17 @@ export default class MoviesList extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.searchString != prevProps.searchResult) {
-            this.fetchMovies();
+        if (this.props.searchString != prevProps.searchString) {
+            this.setState({ page: 1 }, () => this.fetchMovies());
         }
+    }
+
+    handlePreviousPageClicked = () => {
+        this.setState(state => ({ page: state.page - 1 }), () => this.fetchMovies());
+    }
+
+    handleNextPageClicked = () => {
+        this.setState(state => ({ page: state.page + 1 }), () => this.fetchMovies());
     }
 
     render() {
@@ -56,10 +66,25 @@ export default class MoviesList extends React.Component {
                 </div>))
             : "Movies not found"
 
-        return (
-            <div className="row m-3">
-                {movies}
+        const pagination = (this.state.movies)
+            ? <div className="row">
+                <div className="col">
+                    <Pagination
+                        page={this.state.page}
+                        handlePreviousPageClicked={this.handlePreviousPageClicked}
+                        handleNextPageClicked={this.handleNextPageClicked}
+                    />
+                </div>
             </div>
+            : null;
+
+        return (
+            <>
+                {pagination}
+                <div className="row mt-3 mb-3">
+                    {movies}
+                </div>
+            </>
         );
     }
 }

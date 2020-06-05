@@ -24,8 +24,10 @@ class App extends React.Component {
                         <Search handleSearchButtonClicked={this.handleSearchButtonClicked} />
                     </div>
                 </div>
-                <div className="row">
-                    <MoviesList searchString={this.state.searchString} />
+                <div className="row mt-3">
+                    <div className="col">
+                        <MoviesList searchString={this.state.searchString} />
+                    </div>
                 </div>
             </div>
         )
